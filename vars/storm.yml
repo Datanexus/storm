@@ -1,0 +1,73 @@
+# (c) 2017 DataNexus Inc.  All Rights Reserved
+#
+# Defaults that are necessary for all deployments of
+# Apache Storm
+---
+application: storm
+
+storm_dir: "/opt/apache-storm"
+storm_data_dir: "/data"
+storm_package_list: ["java-1.8.0-openjdk", "java-1.8.0-openjdk-devel"]
+
+# the username and group that should be used when installing and running Storm
+storm_user: "storm"
+storm_group: "storm"
+
+# the version and distribution URL
+storm_version: "1.1.1"
+storm_url: "http://www-us.apache.org/dist/storm/apache-storm-{{storm_version}}/apache-storm-{{storm_version}}.tar.gz"
+
+# parameters used for single-node deployments (when using a bundled Zookeeper
+# instance rather than an external Zookeeper ensemble)
+zookeeper_dir: "/opt/apache-zookeeper"
+zookeeper_version: "3.4.9"
+zookeeper_url: "http://www-us.apache.org/dist/zookeeper/zookeeper-{{zookeeper_version}}/zookeeper-{{zookeeper_version}}.tar.gz"
+
+# path used to access private keys (defaults to the current working directory)
+private_key_path: "{{playbook_dir}}"
+
+# define a few defaults that are used when deploying the Storm cluster
+nimbus_childopts: "-Xmx1024m"
+ui_port: 9797
+ui_childopts: "-Xmx768m"
+worker_childopts: "-Xmx768m"
+
+# this variable defines the default ensemble that will be created when
+# deploying to an AWS or OpenStack environment; the value defined here will
+# result in the deployment of a three-node storm cluster
+node_map:
+  - { application: storm, count: 3 }
+
+# and define a set of application-specific security group rules; this list of
+# dictionary entries is used when setting up an application-specific security
+# on the network used by this application; the rules defined here allow for
+# access over the internal subnet for:
+#
+#  - internode communications with an external Zookeeper ensemble via port 2181
+#  - the DRPC invocations port; used by worker processes within the cluster (port 3773)
+#  - internode communications over the nimbus thrift port (port 6627)
+#  - "external" DRPC client connections (port 3772)
+#  - "external" HTTP DRPC clients (port 3774)
+#  - access to the supervisor slots by worker processes (on ports 6700, 6701, 6702, 6703)
+#  - browser connections via the logviewer port (port 8000)
+#
+# access over the external subnet is limited to:
+#
+#  - browser connections via the "{{ui_port}}" (defaults to port 9797, above)
+#
+# this set of rules should, more than likely, not be overridden; if it is
+# overridden, then care should be taken to at least maintain this default list
+# of application-specific security group rules or the nodes in the cluster may
+# not be able to communicate with each other
+application_sg_rules:
+  - { proto: tcp, from_port: "{{ui_port}}", to_port: "{{ui_port}}", cidr_ip: "{{external_subnet}}" }
+  - { proto: tcp, from_port: 2181, to_port: 2181, cidr_ip: "{{internal_subnet}}" }
+  - { proto: tcp, from_port: 3773, to_port: 3773, cidr_ip: "{{internal_subnet}}" }
+  - { proto: tcp, from_port: 6627, to_port: 6627, cidr_ip: "{{internal_subnet}}" }
+  - { proto: tcp, from_port: 3772, to_port: 3772, cidr_ip: "{{internal_subnet}}" }
+  - { proto: tcp, from_port: 3774, to_port: 3774, cidr_ip: "{{internal_subnet}}" }
+  - { proto: tcp, from_port: 6700, to_port: 6700, cidr_ip: "{{internal_subnet}}" }
+  - { proto: tcp, from_port: 6701, to_port: 6701, cidr_ip: "{{internal_subnet}}" }
+  - { proto: tcp, from_port: 6702, to_port: 6702, cidr_ip: "{{internal_subnet}}" }
+  - { proto: tcp, from_port: 6703, to_port: 6703, cidr_ip: "{{internal_subnet}}" }
+  - { proto: tcp, from_port: 8000, to_port: 8000, cidr_ip: "{{internal_subnet}}" }

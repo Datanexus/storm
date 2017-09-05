@@ -1,0 +1,7 @@
+# (c) 2017 DataNexus Inc.  All Rights Reserved
+---
+- name: Start storm-zookeeper service
+  become: true
+  service:
+    name: storm-zookeeper
+    state: restarted

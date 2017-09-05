@@ -1,0 +1,15 @@
+[Unit]
+Description=Apache Zookeeper server (Storm)
+Documentation=http://zookeeper.apache.org
+Requires=network.target remote-fs.target
+After=network.target remote-fs.target
+
+[Service]
+Type=forking
+User=storm
+Group=storm
+Environment=ZOO_LOG_DIR={{zookeeper_dir}}/logs/
+ExecStart={{zookeeper_dir}}/bin/zkServer.sh start
+
+[Install]
+WantedBy=multi-user.target

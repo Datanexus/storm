@@ -1,0 +1,26 @@
+# (c) 2017 DataNexus Inc.  All Rights Reserved
+---
+- name: Pause before starting storm nimbus service
+  become: true
+  command: sleep 10
+- name: Start storm nimbus
+  become: true
+  service:
+    name: storm-nimbus
+    state: restarted
+- name: Pause before starting storm supervisor service
+  become: true
+  command: sleep 10
+- name: Start storm supervisor
+  become: true
+  service:
+    name: storm-supervisor
+    state: restarted
+- name: Pause before starting storm ui service
+  become: true
+  command: sleep 10
+- name: Start storm ui service
+  become: true
+  service:
+    name: storm-ui
+    state: restarted

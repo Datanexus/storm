@@ -1,0 +1,11 @@
+# (c) 2017 DataNexus Inc.  All Rights Reserved
+---
+- name: Enable storm services on boot
+  become: true
+  service:
+    name: "{{item}}"
+    enabled: yes
+  with_items:
+    - storm-nimbus
+    - storm-supervisor
+    - storm-ui

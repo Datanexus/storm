@@ -1,0 +1,15 @@
+# (c) 2017 DataNexus Inc.  All Rights Reserved
+---
+- name: Create storm group
+  become: true
+  group:
+    name: "{{storm_group}}"
+    system: yes
+- name: Create storm user
+  become: true
+  user:
+    name: "{{storm_user}}"
+    group: "{{storm_group}}"
+    createhome: no
+    system: yes
+    

@@ -1,0 +1,15 @@
+[Unit]
+Description=Apache Storm
+Documentation=http://storm.apache.org/releases/1.0.2/index.html
+Requires=network.target remote-fs.target
+After=network.target remote-fs.target syslog.target
+
+[Service]
+Type=simple
+User=storm
+Group=storm
+ExecStart={{storm_dir}}/bin/storm supervisor
+ExecStop={{storm_dir}}/bin/storm help
+
+[Install]
+WantedBy=multi-user.target

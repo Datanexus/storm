@@ -1,0 +1,24 @@
+# (c) 2017 DataNexus Inc.  All Rights Reserved
+---
+- name: Create storm nimbus service file
+  become: true
+  template:
+    src: "../templates/apache-storm-nimbus.j2"
+    dest: /etc/systemd/system/storm-nimbus.service
+    mode: 0644
+- name: Create storm supervisor service file
+  become: true
+  template:
+    src: "../templates/apache-storm-supervisor.j2"
+    dest: /etc/systemd/system/storm-supervisor.service
+    mode: 0644
+- name: Create storm ui service file
+  become: true
+  template:
+    src: "../templates/apache-storm-ui.j2"
+    dest: /etc/systemd/system/storm-ui.service
+    mode: 0644
+- name: restart systemctl daemon
+  become: true
+  command: systemctl daemon-reload
+  
