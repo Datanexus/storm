@@ -74,7 +74,7 @@
     lineinfile:
       dest: "{{storm_dir}}/conf/storm.yaml"
       regexp: "^(.*)ui.host:"
-      line: "ui.host: {{api_addr}}"
+      line: "ui.host: {{data_addr}}"
   - name: Setup UI options for storm node(s)
     lineinfile:
       dest: "{{storm_dir}}/conf/storm.yaml"
