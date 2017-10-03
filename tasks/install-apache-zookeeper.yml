@@ -55,5 +55,5 @@
   become_user: "{{storm_user}}"
   template:
     src: "zoo-cfg.j2"
-    dest: "{{zookeeper_dir}}/conf/"
+    dest: "{{zookeeper_dir}}/conf/zoo.cfg"
     mode: 0644

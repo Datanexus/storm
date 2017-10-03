@@ -2,6 +2,8 @@
 ---
 - set_fact:
     strm_nodes: "{{storm_nodes | map('extract', hostvars, [('ansible_' + data_iface), 'ipv4', 'address']) | list}}"
+# if an external Zookeeper node or cluster was found, then configure the
+# storm nodes to use it
 - block:
   - name: Configure storm to use ane external zookeeper cluster (if defined)
     lineinfile:
@@ -17,6 +19,16 @@
   become: true
   become_user: "{{storm_user}}"
   when: (zk_nodes | default([])) != []
+# if an external Zookeeper node or cluster was not found, then setup the
+# log directory Zookeeper will use
+- name: Ensure that the zookeeper log directory exists (if standalone)
+  file:
+    path: "{{(storm_data_dir is defined) | ternary(storm_data_dir + '/zookeeper','/opt/apache-zookeeper/data')}}"
+    state: directory
+    owner: "{{storm_user}}"
+    group: "{{storm_group}}"
+  when: (zk_nodes | default([])) == []
+  become: true
 - name: Configure storm cluster (if more than one storm node)
   lineinfile:
     dest: "{{storm_dir}}/conf/storm.yaml"
@@ -62,7 +74,7 @@
     lineinfile:
       dest: "{{storm_dir}}/conf/storm.yaml"
       regexp: "^(.*)ui.host:"
-      line: "ui.host: {{api_addr}}"
+      line: "ui.host: {{data_addr}}"
   - name: Setup UI options for storm node(s)
     lineinfile:
       dest: "{{storm_dir}}/conf/storm.yaml"
