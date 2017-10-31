@@ -22,10 +22,12 @@
           node_map_entries: "{{node_map | selectattr('application', 'equalto', application) | list}}"
       # if more than one node_map entry was found or no matching node_map
       # entries were found, then it's an error
-      - fail:
+      - name: Fail playbook run if multiple storm node_map entries were found
+        fail:
           msg: "Multiple {{application}} node_map entries found"
         when: node_map_entries | length > 1
-      - fail:
+      - name: Fail playbook run if no storm node_map entries were found
+        fail:
           msg: "No {{application}} node_map entries found"
         when: node_map_entries | length == 0
       # build the storm and zookeeper host groups from existing inventory
@@ -49,7 +51,8 @@
       # if an external Zookeeper ensemble (or node) was not found and we're
       # deploying an Storm cluster (or multiple matching Storm nodes were
       # found), then it's an error
-      - fail:
+      - name: Fail playbook run if cluster deployment and external zookeeper ensemble not found
+        fail:
           msg: "An external Zookeeper ensemble is required for Storm cluster deployments"
         when:
           - (num_storm_nodes | int == 0 and node_map_entries.0.count > 1) or num_storm_nodes | int > 1
@@ -58,12 +61,14 @@
       # instances into the target cloud environment, ensuring that there
       # are an appropriately tagged, based on the input tags and the node_map
       # entries for this application
-      - include_role:
+      - name: Launch AWS VMs
+        include_role:
           name: 'aws'
         when: num_storm_nodes | int == 0 and cloud == 'aws'
-      - include_role:
+      - name: Launch OSP VMs
+        include_role:
           name: 'osp'
-        when: num_storm_nodes == 0 and cloud == 'osp'
+        when: num_storm_nodes | int == 0 and cloud == 'osp'
       when: cloud is defined and (cloud == 'aws' or cloud == 'osp')
 
 # If we're dynamically provisioning, then do some final configuration on the
